@@ -126,6 +126,13 @@ def load_csv(path):
 
 def select_internship(driver):
     print("  [Internship] Locating combobox ...")
+    # Debug: check all buttons with id containing 'internship'
+    all_buttons = driver.find_elements(By.TAG_NAME, "button")
+    internship_buttons = [b for b in all_buttons if 'internship' in (b.get_attribute('id') or '').lower()]
+    print(f"  [Debug] Found {len(internship_buttons)} buttons with 'internship' in id:")
+    for i, b in enumerate(internship_buttons):
+        print(f"    {i}: id='{b.get_attribute('id')}', role='{b.get_attribute('role')}', text='{b.text.strip()}'")
+    
     btn = wait_visible(
         driver,
         By.XPATH,
@@ -416,6 +423,13 @@ def fill_single_entry(driver, row, col_map):
     combobox_check = driver.find_elements(By.XPATH, "//button[@id='internship_id' and @role='combobox']")
     if not [e for e in combobox_check if e.is_displayed()]:
         print("  [Nav] Form not visible - trying Create button ...")
+        # Debug: check all buttons with 'create' in text
+        all_buttons = driver.find_elements(By.TAG_NAME, "button")
+        create_buttons = [b for b in all_buttons if 'create' in b.text.lower()]
+        print(f"  [Debug] Found {len(create_buttons)} buttons with 'create' in text:")
+        for i, b in enumerate(create_buttons):
+            print(f"    {i}: text='{b.text.strip()}', id='{b.get_attribute('id')}', class='{b.get_attribute('class')}'")
+        
         create_xpaths = [
             "//a[contains(normalize-space(.),'Create')]",
             "//button[contains(normalize-space(.),'Create')]",
@@ -478,8 +492,10 @@ def main():
                 raise
 
         print("\n[Done] All rows processed.")
+        if TEST_MODE:
+            print("  [TEST MODE] Keeping browser open for 30s to inspect result...")
+            time.sleep(30)
     finally:
-        input("\n[Press ENTER to close browser]")
         driver.quit()
 
 
